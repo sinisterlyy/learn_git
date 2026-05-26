@@ -1,0 +1,1259 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Git for Interns · 60 Minutes · Alumet IT</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600;700&family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,700;9..144,900&family=Sarabun:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --bg-2: #111726;
+    --ink: #e8ecf3;
+    --ink-dim: #8d96a8;
+    --ink-dimmer: #525a6b;
+    --accent: #ff5e3a;
+    --accent-2: #ffd23f;
+    --accent-3: #4ade80;
+    --line: #1f2738;
+    --code-bg: #0f1422;
+    --grid: rgba(255,255,255,0.025);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Sarabun', 'IBM Plex Mono', sans-serif;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+  }
+  body {
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+  .deck { position: relative; height: 100vh; width: 100vw; }
+  .slide {
+    position: absolute;
+    inset: 0;
+    padding: 4vh 6vw;
+    display: none;
+    flex-direction: column;
+    opacity: 0;
+    transition: opacity 0.35s ease;
+    overflow-y: auto;
+  }
+  .slide.active {
+    display: flex;
+    opacity: 1;
+    animation: slideIn 0.5s ease forwards;
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Header bar */
+  .topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-dimmer);
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    padding-bottom: 2vh;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 4vh;
+  }
+  .topbar .left::before {
+    content: '●';
+    color: var(--accent);
+    margin-right: 8px;
+  }
+  .topbar .right { font-variant-numeric: tabular-nums; }
+
+  /* Footer */
+  .footer {
+    position: absolute;
+    bottom: 2.5vh;
+    left: 6vw;
+    right: 6vw;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--ink-dimmer);
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+  }
+
+  /* Typography */
+  h1.display {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: clamp(48px, 8vw, 120px);
+    line-height: 0.92;
+    letter-spacing: -0.03em;
+    color: var(--ink);
+  }
+  h1.display .accent { color: var(--accent); font-style: italic; font-weight: 300; }
+  h2.section-title {
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: clamp(36px, 5vw, 68px);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin-bottom: 3vh;
+  }
+  h2.section-title .num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 400;
+    font-size: 0.5em;
+    color: var(--accent);
+    display: block;
+    margin-bottom: 0.6em;
+    letter-spacing: 0.1em;
+  }
+  h3 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: clamp(22px, 2.4vw, 32px);
+    margin-bottom: 1.2vh;
+    letter-spacing: -0.01em;
+  }
+  p, li {
+    font-size: clamp(15px, 1.25vw, 19px);
+    line-height: 1.55;
+    color: var(--ink-dim);
+    font-weight: 400;
+  }
+  p strong, li strong { color: var(--ink); font-weight: 600; }
+  .lead {
+    font-family: 'Fraunces', serif;
+    font-weight: 300;
+    font-size: clamp(20px, 2vw, 28px);
+    line-height: 1.4;
+    color: var(--ink-dim);
+    max-width: 60ch;
+  }
+  .lead em { color: var(--accent-2); font-style: italic; }
+
+  /* Code blocks */
+  .code {
+    font-family: 'IBM Plex Mono', monospace;
+    background: var(--code-bg);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 18px 22px;
+    font-size: clamp(13px, 1.1vw, 16px);
+    line-height: 1.65;
+    color: var(--ink);
+    overflow-x: auto;
+    position: relative;
+  }
+  .code::before {
+    content: attr(data-label);
+    position: absolute;
+    top: -10px;
+    left: 16px;
+    background: var(--bg);
+    padding: 2px 10px;
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+  .code .prompt { color: var(--accent); user-select: none; }
+  .code .cmd { color: var(--ink); }
+  .code .arg { color: var(--accent-2); }
+  .code .comment { color: var(--ink-dimmer); font-style: italic; }
+  .code .out { color: var(--ink-dim); }
+  .code .ok { color: var(--accent-3); }
+
+  /* Layouts */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 4vw; flex: 1; align-items: start; }
+  .three-col { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2vw; }
+  .col-stack > * + * { margin-top: 2vh; }
+
+  /* Cards */
+  .card {
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 22px 24px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.015), transparent);
+  }
+  .card .tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    display: block;
+  }
+  .card h3 { margin-bottom: 8px; }
+
+  /* Lists */
+  ul.clean { list-style: none; }
+  ul.clean li {
+    padding-left: 28px;
+    position: relative;
+    margin-bottom: 12px;
+  }
+  ul.clean li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  ol.steps { list-style: none; counter-reset: step; }
+  ol.steps li {
+    counter-increment: step;
+    padding-left: 60px;
+    position: relative;
+    margin-bottom: 18px;
+    min-height: 40px;
+  }
+  ol.steps li::before {
+    content: counter(step, decimal-leading-zero);
+    position: absolute;
+    left: 0;
+    top: -4px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 28px;
+    font-weight: 300;
+    color: var(--accent);
+    letter-spacing: -0.05em;
+  }
+
+  /* Timeline (agenda) */
+  .timeline {
+    border-left: 1px solid var(--line);
+    padding-left: 30px;
+    margin-top: 2vh;
+  }
+  .timeline-item {
+    position: relative;
+    padding-bottom: 20px;
+  }
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -36px;
+    top: 8px;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: var(--bg);
+    border: 2px solid var(--accent);
+  }
+  .timeline-item .time {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--accent);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 2px;
+  }
+  .timeline-item h3 { margin-bottom: 2px; font-weight: 500; }
+
+  /* Diagram */
+  .git-flow {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1vw;
+    margin: 3vh 0;
+    align-items: stretch;
+  }
+  .flow-box {
+    border: 1px solid var(--line);
+    background: var(--bg-2);
+    border-radius: 6px;
+    padding: 18px;
+    text-align: center;
+    position: relative;
+  }
+  .flow-box .label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .flow-box h3 { font-size: 18px; margin-bottom: 6px; }
+  .flow-box p { font-size: 13px; }
+  .flow-arrow {
+    position: absolute;
+    right: -1.2vw;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--accent);
+    font-size: 16px;
+    z-index: 2;
+  }
+  .flow-arrow .verb {
+    display: block;
+    font-size: 10px;
+    color: var(--ink-dimmer);
+    text-align: center;
+    margin-top: 2px;
+  }
+
+  /* Inline code */
+  code.inline {
+    font-family: 'IBM Plex Mono', monospace;
+    background: var(--code-bg);
+    padding: 2px 7px;
+    border-radius: 3px;
+    font-size: 0.88em;
+    color: var(--accent-2);
+    border: 1px solid var(--line);
+  }
+
+  /* Cheatsheet table */
+  .cheat-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: clamp(12px, 1vw, 15px);
+  }
+  .cheat-table th {
+    text-align: left;
+    padding: 10px 14px;
+    color: var(--accent);
+    border-bottom: 1px solid var(--line);
+    font-weight: 500;
+    text-transform: uppercase;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+  }
+  .cheat-table td {
+    padding: 9px 14px;
+    border-bottom: 1px solid var(--line);
+    color: var(--ink-dim);
+    vertical-align: top;
+  }
+  .cheat-table td:first-child { color: var(--accent-2); white-space: nowrap; }
+  .cheat-table tr:hover td { background: rgba(255,94,58,0.04); }
+
+  /* Navigation */
+  .nav {
+    position: fixed;
+    bottom: 20px;
+    right: 24px;
+    display: flex;
+    gap: 8px;
+    z-index: 100;
+  }
+  .nav button {
+    background: var(--bg-2);
+    border: 1px solid var(--line);
+    color: var(--ink);
+    width: 36px;
+    height: 36px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: 'IBM Plex Mono', monospace;
+    transition: all 0.2s;
+  }
+  .nav button:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .counter {
+    position: fixed;
+    bottom: 26px;
+    left: 24px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-dimmer);
+    letter-spacing: 0.18em;
+    z-index: 100;
+  }
+  .counter .current { color: var(--ink); }
+
+  /* Hero specifics */
+  .hero {
+    justify-content: center;
+    align-items: flex-start;
+    padding-left: 8vw;
+  }
+  .hero-meta {
+    display: flex;
+    gap: 40px;
+    margin-top: 5vh;
+    padding-top: 3vh;
+    border-top: 1px solid var(--line);
+    width: 70%;
+  }
+  .hero-meta div {
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  .hero-meta .label {
+    font-size: 10px;
+    color: var(--ink-dimmer);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .hero-meta .val {
+    font-size: 14px;
+    color: var(--ink);
+  }
+  .ornament {
+    position: absolute;
+    bottom: 12vh;
+    right: 6vw;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--ink-dimmer);
+    letter-spacing: 0.2em;
+    transform: rotate(-90deg);
+    transform-origin: right bottom;
+  }
+
+  /* Callout */
+  .callout {
+    border-left: 3px solid var(--accent);
+    background: rgba(255,94,58,0.04);
+    padding: 16px 22px;
+    margin-top: 2vh;
+    border-radius: 0 4px 4px 0;
+  }
+  .callout .label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .callout p { color: var(--ink); }
+
+  /* Pill */
+  .pill {
+    display: inline-block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    padding: 4px 10px;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    border-radius: 99px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 2vh;
+  }
+
+  /* End slide */
+  .end-mark {
+    font-family: 'Fraunces', serif;
+    font-size: 160px;
+    font-weight: 300;
+    font-style: italic;
+    color: var(--accent);
+    line-height: 1;
+  }
+</style>
+</head>
+<body>
+
+<div class="deck">
+
+  <!-- ============ SLIDE 1: COVER ============ -->
+  <section class="slide hero active">
+    <div class="topbar">
+      <div class="left">Alumet IT · Intern Onboarding</div>
+      <div class="right">26.05.2026 / 60 min</div>
+    </div>
+    <span class="pill">Workshop · Hands-on</span>
+    <h1 class="display">Git <span class="accent">in 60</span><br>minutes.</h1>
+    <p class="lead" style="margin-top: 3vh;">เริ่มจากศูนย์ ถึงเขียน commit แรกและ push ขึ้น GitHub ได้จริง — <em>ไม่ต้องท่อง, ใช้เป็น</em></p>
+    <div class="hero-meta">
+      <div>
+        <div class="label">Audience</div>
+        <div class="val">IT Interns · New hires</div>
+      </div>
+      <div>
+        <div class="label">Tools</div>
+        <div class="val">VS Code · Terminal · GitHub</div>
+      </div>
+      <div>
+        <div class="label">Format</div>
+        <div class="val">Demo + ลงมือทำ</div>
+      </div>
+    </div>
+    <div class="ornament">→ press space to begin</div>
+  </section>
+
+  <!-- ============ SLIDE 2: AGENDA ============ -->
+  <section class="slide">
+    <div class="topbar">
+      <div class="left">Agenda</div>
+      <div class="right">02 / 14</div>
+    </div>
+    <h2 class="section-title"><span class="num">/ 60 minutes</span>กำหนดการ</h2>
+    <div class="two-col">
+      <div>
+        <p class="lead">เน้นลงมือทำ 70%<br>ทฤษฎีพอเข้าใจ 30%</p>
+        <div class="callout" style="margin-top: 3vh;">
+          <div class="label">ตอนจบ คุณจะ...</div>
+          <p>สร้าง repo, commit, push, pull, สร้าง branch และทำ pull request ได้ด้วยตัวเอง</p>
+        </div>
+      </div>
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="time">00:00 — 00:10</div>
+          <h3>Git คืออะไร & ติดตั้ง</h3>
+          <p>Concept + setup VS Code + Terminal</p>
+        </div>
+        <div class="timeline-item">
+          <div class="time">00:10 — 00:25</div>
+          <h3>Core workflow</h3>
+          <p>init · add · commit · status · log</p>
+        </div>
+        <div class="timeline-item">
+          <div class="time">00:25 — 00:40</div>
+          <h3>GitHub + Remote</h3>
+          <p>clone · push · pull · SSH key</p>
+        </div>
+        <div class="timeline-item">
+          <div class="time">00:40 — 00:55</div>
+          <h3>Branch & Pull Request</h3>
+          <p>ทำงานเป็นทีมแบบไม่ทับงานกัน</p>
+        </div>
+        <div class="timeline-item">
+          <div class="time">00:55 — 01:00</div>
+          <h3>Cheatsheet + Q&A</h3>
+          <p>สรุป + ของแถม</p>
+        </div>
+      </div>
+    </div>
+    <div class="footer">
+      <div>git-for-interns.html</div>
+      <div>02 / 14</div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 3: WHY GIT ============ -->
+  <section class="slide">
+    <div class="topbar">
+      <div class="left">Part 01 · Concept</div>
+      <div class="right">03 / 14</div>
+    </div>
+    <h2 class="section-title"><span class="num">/ part 01</span>ทำไมต้องใช้ Git?</h2>
+    <div class="two-col">
+      <div class="col-stack">
+        <p class="lead">ลองนึกถึง <em>"ปุ่ม Save"</em> ของชีวิตจริง — บันทึกได้ทุกเวลา ย้อนกลับได้ทุกจุด เห็นว่าใครแก้อะไร เมื่อไหร่</p>
+        <div class="callout">
+          <div class="label">ปัญหาที่ Git แก้ได้</div>
+          <p style="font-size: 15px; line-height: 1.7;">• ลบไฟล์ผิด → ย้อนกลับได้<br>
+          • ไม่รู้ว่าโค้ดเสียตอนไหน → ดู history ได้<br>
+          • หลายคนแก้ไฟล์เดียวกัน → ไม่ทับงานกัน<br>
+          • อยากลองทำ feature ใหม่ → แยก branch ทำ ถ้าพังไม่กระทบของหลัก</p>
+        </div>
+      </div>
+      <div class="col-stack">
+        <div class="card">
+          <span class="tag">Git ≠ GitHub</span>
+          <h3>เข้าใจให้ถูก</h3>
+          <p style="margin-top: 8px;"><strong style="color:var(--accent-2)">Git</strong> = ระบบบันทึกการเปลี่ยนแปลง ทำงานบนเครื่องคุณ (offline ได้)</p>
+          <p style="margin-top: 8px;"><strong style="color:var(--accent-3)">GitHub</strong> = เว็บไซต์ที่เก็บ Git repo ออนไลน์ ไว้แชร์กับทีม</p>
+          <p style="margin-top: 12px; font-size: 14px; color: var(--ink-dimmer); font-style: italic;">เปรียบเทียบ: Git = Microsoft Word · GitHub = Google Drive</p>
+        </div>
+        <div class="card">
+          <span class="tag">Real talk</span>
+          <h3>ในงานจริงที่ Alumet</h3>
+          <p style="margin-top: 8px;">โค้ด Django, scripts, configs ของระบบทั้งหมดเก็บใน Git — ถ้าใช้ไม่เป็น = ทำงานทีมไม่ได้</p>
+        </div>
+      </div>
+    </div>
+    <div class="footer">
+      <div>Why version control matters</div>
+      <div>03 / 14</div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 4: SETUP ============ -->
+  <section class="slide">
+    <div class="topbar">
+      <div class="left">Part 01 · Setup</div>
+      <div class="right">04 / 14</div>
+    </div>
+    <h2 class="section-title"><span class="num">/ 10 min</span>ติดตั้งและ Config</h2>
+    <div class="two-col">
+      <div>
+        <ol class="steps">
+          <li>
+            <h3>ติดตั้ง Git</h3>
+            <p>Windows: <code class="inline">git-scm.com/download/win</code><br>macOS: <code class="inline">brew install git</code></p>
+          </li>
+          <li>
+            <h3>เปิด VS Code → Terminal</h3>
+            <p>เมนู View → Terminal (หรือ <code class="inline">Ctrl + `</code>)</p>
+          </li>
+          <li>
+            <h3>เช็คว่าติดตั้งสำเร็จ</h3>
+            <p>พิมพ์ <code class="inline">git --version</code> ต้องเห็นเลขเวอร์ชั่น</p>
+          </li>
+          <li>
+            <h3>บอก Git ว่าคุณเป็นใคร</h3>
+            <p>ทำครั้งเดียวพอ ต่อไปทุก commit จะมีชื่อคุณ</p>
+          </li>
+        </ol>
+      </div>
+      <div class="col-stack">
+        <div class="code" data-label="terminal · one-time setup">
+<span class="prompt">$</span> <span class="cmd">git</span> <span class="arg">--version</span>
+<span class="out">git version 2.43.0</span>
+
+<span class="prompt">$</span> <span class="cmd">git config</span> <span class="arg">--global user.name</span> <span class="arg">"Somchai Jaidee"</span>
+<span class="prompt">$</span> <span class="cmd">git config</span> <span class="arg">--global user.email</span> <span class="arg">"somchai@alumet.co.th"</span>
+
+<span class="comment"># ตั้ง default branch เป็น main</span>
+<span class="prompt">$</span> <span class="cmd">git config</span> <span class="arg">--global init.defaultBranch main</span>
+
+<span class="comment"># เช็คว่าตั้งถูกหรือยัง</span>
+<span class="prompt">$</span> <span class="cmd">git config</span> <span class="arg">--list</span>
+        </div>
+        <div class="callout">
+          <div class="label">⚠ สำคัญ</div>
+          <p>ใช้ email เดียวกันกับที่สมัคร GitHub ถ้าใช้คนละ email ระบบจะไม่นับว่าเป็น contribution ของคุณ</p>
+        </div>
+      </div>
+    </div>
+    <div class="footer">
+      <div>One-time configuration</div>
+      <div>04 / 14</div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 5: MENTAL MODEL ============ -->
+  <section class="slide">
+    <div class="topbar">
+      <div class="left">Part 02 · Mental Model</div>
+      <div class="right">05 / 14</div>
+    </div>
+    <h2 class="section-title"><span class="num">/ part 02</span>3 พื้นที่ของ Git</h2>
+    <p class="lead" style="margin-bottom: 1vh;">เข้าใจอันนี้ — ที่เหลือง่ายหมด</p>
+
+    <div class="git-flow">
+      <div class="flow-box">
+        <div class="label">01</div>
+        <h3>Working Dir</h3>
+        <p>ไฟล์ที่คุณกำลังแก้อยู่ใน VS Code</p>
+        <div class="flow-arrow">→<span class="verb">git add</span></div>
+      </div>
+      <div class="flow-box">
+        <div class="label">02</div>
+        <h3>Staging Area</h3>
+        <p>ของที่เตรียมจะ commit แต่ยังไม่บันทึก</p>
+        <div class="flow-arrow">→<span class="verb">git commit</span></div>
+      </div>
+      <div class="flow-box">
+        <div class="label">03</div>
+        <h3>Local Repo</h3>
+        <p>บันทึกถาวรในเครื่องคุณ มี history</p>
+        <div class="flow-arrow">→<span class="verb">git push</span></div>
+      </div>
+      <div class="flow-box" style="border-color: var(--accent-3);">
+        <div class="label" style="color: var(--accent-3)">04</div>
+        <h3>GitHub</h3>
+        <p>เก็บออนไลน์ แชร์กับทีม</p>
+      </div>
+    </div>
+
+    <div class="two-col" style="margin-top: 3vh;">
+      <div class="callout">
+        <div class="label">Analogy: ส่งของไปไปรษณีย์</div>
+        <p style="font-size: 15px; line-height: 1.7;"><strong>Working dir</strong> = ของในบ้านคุณ<br>
+        <strong>Staging</strong> = ของที่ใส่กล่องเตรียมส่งแล้ว<br>
+        <strong>Local repo</strong> = ส่งเข้าคลังของไปรษณีย์<br>
+        <strong>GitHub</strong> = ส่งไปยังปลายทาง</p>
+      </div>
+      <div>
+        <h3>คำสั่งหลัก 3 ตัว</h3>
+        <p style="margin-top: 10px;">จำ 3 คำนี้พอ ใช้ทุกวัน:</p>
+        <ul class="clean" style="margin-top: 12px;">
+          <li><code class="inline">git add</code> — เอาไฟล์เข้า staging</li>
+          <li><code class="inline">git commit</code> — บันทึกลง local repo</li>
+          <li><code class="inline">git push</code> — ส่งขึ้น GitHub</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer">
+      <div>The three trees of Git</div>
+      <div>05 / 14</div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 6: FIRST REPO ============ -->
+  <section class="slide">
+    <div class="topbar">
+      <div class="left">Part 02 · Hands-on</div>
+      <div class="right">06 / 14</div>
+    </div>
+    <h2 class="section-title"><span class="num">/ hands-on #1</span>สร้าง Repo แรก</h2>
+    <div class="two-col">
+      <div>
+        <p class="lead" style="margin-bottom: 2vh;">ทำตามทุกบรรทัด → จะมี repo จริงในเครื่อง</p>
+        <ol class="steps">
+          <li>
+            <h3>สร้างโฟลเดอร์ใหม่</h3>
+            <p>ตั้งชื่อ <code class="inline">my-first-repo</code></p>
+          </li>
+          <li>
+            <h3>เปิดด้วย VS Code</h3>
+            <p>File → Open Folder</p>
+          </li>
+          <li>
+            <h3>เปิด Terminal ในโฟลเดอร์นั้น</h3>
+            <p>Terminal → New Terminal</p>
+          </li>
+          <li>
+            <h3>เริ่ม Git</h3>
+            <p>พิมพ์ <code class="inline">git init</code> — จะมีโฟลเดอร์ <code class="inline">.git</code> ซ่อนอยู่</p>
+          </li>
+          <li>
+            <h3>สร้างไฟล์ทดสอบ</h3>
+            <p>สร้าง <code class="inline">README.md</code> เขียนอะไรก็ได้</p>
+          </li>
+        </ol>
+      </div>
+      <div>
+        <div class="code" data-label="terminal · live demo">
+<span class="prompt">$</span> <span class="cmd">mkdir</span> <span class="arg">my-first-repo</span>
+<span class="prompt">$</span> <span class="cmd">cd</span> <span class="arg">my-first-repo</span>
+
+<span class="prompt">$</span> <span class="cmd">git init</span>
+<span class="ok">Initialized empty Git repository in
+  /Users/you/my-first-repo/.git/</span>
+
+<span class="comment"># สร้างไฟล์ทดสอบ</span>
+<span class="prompt">$</span> <span class="cmd">echo</span> <span class="arg">"# My First Repo"</span> &gt; README.md
+
+<span class="comment"># ดูสถานะ — Git เห็นไฟล์ใหม่แต่ยังไม่ track</span>
+<span class="prompt">$</span> <span class="cmd">git status</span>
+<span class="out">On branch main
+
+No commits yet
+
+Untracked files:
+  (use "git add &lt;file&gt;..." to include)
+        <span style="color:var(--accent)">README.md</span>
+
+nothing added to commit but untracked
+files present</span>
+        </div>
+        <div class="callout" style="margin-top: 2vh;">
+          <div class="label">git status</div>
+          <p>คำสั่งที่ต้องพิมพ์บ่อยที่สุด — มันบอก Git กำลังคิดอะไรอยู่ ใช้ทุกครั้งที่งง</p>
+        </div>
+      </div>
+    </div>
+    <div class="footer">
+      <div>git init · git status</div>
+      <div>06 / 14</div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 7: ADD + COMMIT ============ -->
+  <section class="slide">
+    <div class="topbar">
+      <div class="left">Part 02 · Hands-on</div>
+      <div class="right">07 / 14</div>
+    </div>
+    <h2 class="section-title"><span class="num">/ hands-on #2</span>Commit แรกของคุณ</h2>
+    <div class="two-col">
+      <div>
+        <div class="code" data-label="terminal · the core loop">
+<span class="comment"># 1) เอาไฟล์เข้า staging</span>
+<span class="prompt">$</span> <span class="cmd">git add</span> <span class="arg">README.md</span>
+
+<span class="comment"># หรือเอาทุกไฟล์</span>
+<span class="prompt">$</span> <span class="cmd">git add</span> <span class="arg">.</span>
+
+<span class="comment"># 2) บันทึกพร้อม message อธิบาย</span>
+<span class="prompt">$</span> <span class="cmd">git commit</span> <span class="arg">-m</span> <span class="arg">"Initial commit"</span>
+<span class="ok">[main (root-commit) 3a1b2c4] Initial commit
+ 1 file changed, 1 insertion(+)
+ create mode 100644 README.md</span>
+
+<span class="comment"># 3) ดู history</span>
+<span class="prompt">$</span> <span class="cmd">git log</span>
+<span class="out">commit 3a1b2c4... (HEAD -&gt; main)
+Author: Somchai Jaidee &lt;somchai@alumet.co.th&gt;
+Date:   Tue May 26 10:30:00 2026 +0700
+
+    Initial commit</span>
+
+<span class="comment"># log แบบสั้น สวยกว่า</span>
+<span class="prompt">$</span> <span class="cmd">git log</span> <span class="arg">--oneline</span>
+        </div>
+      </div>
+      <div class="col-stack">
+        <div class="card">
+          <span class="tag">Best Practice</span>
+          <h3>เขียน Commit Message ให้ดี</h3>
+          <p style="margin-top: 10px; color: var(--accent-3);">✓ "Add login validation for empty email"</p>
+          <p style="color: var(--accent-3);">✓ "Fix wrong tax calculation in invoice"</p>
+          <p style="margin-top: 12px; color: #ff6b6b;">✗ "update"</p>
+          <p style="color: #ff6b6b;">✗ "asdf"</p>
+          <p style="color: #ff6b6b;">✗ "แก้บั๊ก"</p>
+          <p style="margin-top: 12px; font-size: 14px; color: var(--ink-dimmer); font-style: italic;">เขียนเป็น verb + ทำอะไร อนาคต 6 เดือนยังต้องอ่านรู้เรื่อง</p>
+        </div>
+        <div class="callout">
+          <div class="label">Workflow ที่ทำซ้ำทุกวัน</div>
+          <p style="font-family: 'IBM Plex Mono', monospace; font-size: 14px;">
+            edit → <strong style="color:var(--accent-2)">add</strong> → <strong style="color:var(--accent-2)">commit</strong> → edit → add → commit ...
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="footer">
+      <div>git add · git commit · git log</div>
+      <div>07 / 14</div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 8: UNDO ============ -->
+  <section class="slide">
+    <div class="topbar">
+      <div class="left">Part 02 · Safety net</div>
+      <div class="right">08 / 14</div>
+    </div>
+    <h2 class="section-title"><span class="num">/ undo</span>ถ้าทำพลาดทำยังไง?</h2>
+    <div class="two-col">
+      <div class="col-stack">
+        <div class="card">
+          <span class="tag">Case 1</span>
+          <h3>แก้ไฟล์แล้วอยากกลับ</h3>
+          <p style="margin-top: 8px;">ยังไม่ได้ add → กลับไปเหมือนเดิม</p>
+          <div class="code" data-label="undo edit" style="margin-top: 10px;">
+<span class="prompt">$</span> <span class="cmd">git restore</span> <span class="arg">file.txt</span>
+          </div>
+        </div>
+        <div class="card">
+          <span class="tag">Case 2</span>
+          <h3>เผลอ add ผิดไฟล์</h3>
+          <p style="margin-top: 8px;">เอาออกจาก staging (ไฟล์ไม่หาย)</p>
+          <div class="code" data-label="unstage" style="margin-top: 10px;">
+<span class="prompt">$</span> <span class="cmd">git restore</span> <span class="arg">--staged file.txt</span>
+          </div>
+        </div>
+      </div>
+      <div class="col-stack">
+        <div class="card">
+          <span class="tag">Case 3</span>
+          <h3>เขียน message ผิดใน commit ล่าสุด</h3>
+          <p style="margin-top: 8px;">แก้ message ใหม่ได้ (ถ้ายังไม่ push)</p>
+          <div class="code" data-label="amend" style="margin-top: 10px;">
+<span class="prompt">$</span> <span class="cmd">git commit</span> <span class="arg">--amend -m "ข้อความใหม่"</span>
+          </div>
+        </div>
+        <div class="callout">
+          <div class="label">กฎเหล็ก</div>
+          <p>อย่าใช้ <code class="inline">--force</code> หรือคำสั่งแก้ history ถ้า push ขึ้นไปแล้ว — มันจะกระทบทีม ถ้าไม่แน่ใจ ถามพี่ก่อน</p>
+        </div>
+        <div style="font-family: 'Fraunces', serif; font-size: 22px; color: var(--ink-dim); font-style: italic; margin-top: 1vh; line-height: 1.4;">
+          "Git is hard to lose work in — once you've committed."
+        </div>
+      </div>
+    </div>
+    <div class="footer">
+      <div>git restore · git commit --amend</div>
+      <div>08 / 14</div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 9: GITHUB SETUP ============ -->
+  <section class="slide">
+    <div class="topbar">
+      <div class="left">Part 03 · GitHub</div>
+      <div class="right">09 / 14</div>
+    </div>
+    <h2 class="section-title"><span class="num">/ part 03</span>เชื่อมกับ GitHub</h2>
+    <div class="two-col">
+      <div>
+        <ol class="steps">
+          <li>
+            <h3>สมัคร GitHub account</h3>
+            <p>ใช้ email เดียวกับที่ตั้งใน git config</p>
+          </li>
+          <li>
+            <h3>สร้าง SSH Key</h3>
+            <p>เพื่อ push ได้โดยไม่ต้องใส่รหัสทุกครั้ง</p>
+          </li>
+          <li>
+            <h3>เอา public key ไปวางใน GitHub</h3>
+            <p>Settings → SSH and GPG keys → New SSH key</p>
+          </li>
+          <li>
+            <h3>สร้าง repo ใหม่บน GitHub</h3>
+            <p>กด "+" มุมขวาบน → New repository<br>เลือก <strong>Private</strong> สำหรับงาน, <strong>Public</strong> สำหรับ portfolio</p>
+          </li>
+          <li>
+            <h3>เชื่อม local กับ GitHub</h3>
+            <p>คำสั่งจะอยู่ในหน้า repo ที่เพิ่งสร้าง</p>
+          </li>
+        </ol>
+      </div>
+      <div class="col-stack">
+        <div class="code" data-label="terminal · SSH key setup">
+<span class="comment"># สร้าง SSH key</span>
+<span class="prompt">$</span> <span class="cmd">ssh-keygen</span> <span class="arg">-t ed25519 -C "your@email"</span>
+<span class="out">Enter file: <span style="color:var(--ink-dimmer)">[Enter ผ่าน]</span>
+Enter passphrase: <span style="color:var(--ink-dimmer)">[Enter ผ่านได้]</span></span>
+
+<span class="comment"># Copy public key</span>
+<span class="prompt">$</span> <span class="cmd">cat</span> <span class="arg">~/.ssh/id_ed25519.pub</span>
+<span class="out">ssh-ed25519 AAAAC3Nz... your@email</span>
+
+<span class="comment"># เอาทั้งบรรทัดไปวางใน GitHub</span>
+<span class="comment"># ทดสอบว่าเชื่อมได้</span>
+<span class="prompt">$</span> <span class="cmd">ssh</span> <span class="arg">-T git@github.com</span>
+<span class="ok">Hi yourusername! You've successfully
+authenticated...</span>
+        </div>
+        <div class="callout">
+          <div class="label">Windows</div>
+          <p>ใช้ Git Bash หรือ PowerShell — คำสั่งเหมือนกัน</p>
+        </div>
+      </div>
+    </div>
+    <div class="footer">
+      <div>SSH authentication</div>
+      <div>09 / 14</div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 10: PUSH/PULL/CLONE ============ -->
+  <section class="slide">
+    <div class="topbar">
+      <div class="left">Part 03 · Remote workflow</div>
+      <div class="right">10 / 14</div>
+    </div>
+    <h2 class="section-title"><span class="num">/ remote</span>Push · Pull · Clone</h2>
+    <div class="two-col">
+      <div class="col-stack">
+        <div class="card">
+          <span class="tag">Push</span>
+          <h3>ส่งของขึ้น GitHub</h3>
+          <div class="code" data-label="push to remote" style="margin-top: 10px;">
+<span class="comment"># เชื่อม remote ครั้งแรก</span>
+<span class="prompt">$</span> <span class="cmd">git remote add</span> <span class="arg">origin</span>
+  <span class="arg">git@github.com:you/repo.git</span>
+
+<span class="comment"># push ครั้งแรก (ตั้ง upstream)</span>
+<span class="prompt">$</span> <span class="cmd">git push</span> <span class="arg">-u origin main</span>
+
+<span class="comment"># ครั้งต่อไป พิมพ์สั้นๆ ได้</span>
+<span class="prompt">$</span> <span class="cmd">git push</span>
+          </div>
+        </div>
+        <div class="card">
+          <span class="tag">Pull</span>
+          <h3>ดึงของล่าสุดลงมา</h3>
+          <p style="margin-top: 8px; font-size: 14px;">เมื่อเพื่อนร่วมทีม push อะไรขึ้นไป คุณต้อง pull ลงมา</p>
+          <div class="code" data-label="sync from remote" style="margin-top: 10px;">
+<span class="prompt">$</span> <span class="cmd">git pull</span>
+          </div>
+        </div>
+      </div>
+      <div class="col-stack">
+        <div class="card">
+          <span class="tag">Clone</span>
+          <h3>เริ่มงานใหม่จาก repo ที่มีอยู่</h3>
+          <p style="margin-top: 8px; font-size: 14px;">เข้ามาวันแรกที่บริษัท → clone repo ของทีม</p>
+          <div class="code" data-label="clone existing repo" style="margin-top: 10px;">
+<span class="prompt">$</span> <span class="cmd">git clone</span>
+  <span class="arg">git@github.com:alumet/project.git</span>
+
+<span class="prompt">$</span> <span class="cmd">cd</span> <span class="arg">project</span>
+<span class="prompt">$</span> <span class="cmd">code</span> <span class="arg">.</span> <span class="comment"># เปิดใน VS Code</span>
+          </div>
+        </div>
+        <div class="callout">
+          <div class="label">Daily routine</div>
+          <p style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; line-height: 1.8;">
+          เช้า:   <strong style="color:var(--accent-2)">git pull</strong><br>
+          ระหว่างวัน: edit → add → commit<br>
+          เลิกงาน: <strong style="color:var(--accent-2)">git push</strong>
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="footer">
+      <div>git push · git pull · git clone</div>
+      <div>10 / 14</div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 11: BRANCH ============ -->
+  <section class="slide">
+    <div class="topbar">
+      <div class="left">Part 04 · Branch</div>
+      <div class="right">11 / 14</div>
+    </div>
+    <h2 class="section-title"><span class="num">/ part 04</span>Branch — ทำหลายอย่างพร้อมกัน</h2>
+    <div class="two-col">
+      <div class="col-stack">
+        <p class="lead">Branch = <em>ก๊อปโลกคู่ขนาน</em><br>ทดลองได้เต็มที่ ถ้าพังไม่กระทบของหลัก</p>
+        <div class="callout">
+          <div class="label">ทำไมต้องใช้ branch</div>
+          <p style="font-size: 15px; line-height: 1.7;">• ทำ feature ใหม่โดยไม่กระทบ <code class="inline">main</code><br>
+          • หลายคนทำงานพร้อมกันไม่ทับกัน<br>
+          • รีวิวโค้ดก่อน merge เข้า main</p>
+        </div>
+        <div style="margin-top: 1vh;">
+          <h3>กฎ Alumet</h3>
+          <p style="margin-top: 8px;">อย่า commit ตรงเข้า <code class="inline">main</code> — แยก branch เสมอ แล้วเปิด PR</p>
+        </div>
+      </div>
+      <div>
+        <div class="code" data-label="branch workflow">
+<span class="comment"># ดู branch ที่มี</span>
+<span class="prompt">$</span> <span class="cmd">git branch</span>
+<span class="out">* <span style="color:var(--accent-3)">main</span></span>
+
+<span class="comment"># สร้าง branch ใหม่ + กระโดดเข้าไป</span>
+<span class="prompt">$</span> <span class="cmd">git switch</span> <span class="arg">-c feature/login-page</span>
+<span class="ok">Switched to a new branch 'feature/login-page'</span>
+
+<span class="comment"># แก้ไฟล์ → add → commit ตามปกติ</span>
+<span class="prompt">$</span> <span class="cmd">git add</span> <span class="arg">.</span>
+<span class="prompt">$</span> <span class="cmd">git commit</span> <span class="arg">-m "Add login form"</span>
+
+<span class="comment"># push branch ขึ้น GitHub</span>
+<span class="prompt">$</span> <span class="cmd">git push</span> <span class="arg">-u origin feature/login-page</span>
+
+<span class="comment"># สลับกลับ main</span>
+<span class="prompt">$</span> <span class="cmd">git switch</span> <span class="arg">main</span>
+
+<span class="comment"># ลบ branch ที่ merge แล้ว</span>
+<span class="prompt">$</span> <span class="cmd">git branch</span> <span class="arg">-d feature/login-page</span>
+        </div>
+        <div class="callout" style="margin-top: 2vh;">
+          <div class="label">Naming convention</div>
+          <p style="font-family: 'IBM Plex Mono', monospace; font-size: 13px;">
+            feature/xxx · fix/xxx · hotfix/xxx
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="footer">
+      <div>git switch · git branch</div>
+      <div>11 / 14</div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 12: PULL REQUEST ============ -->
+  <section class="slide">
+    <div class="topbar">
+      <div class="left">Part 04 · Pull Request</div>
+      <div class="right">12 / 14</div>
+    </div>
+    <h2 class="section-title"><span class="num">/ teamwork</span>Pull Request — รวมโค้ดเข้าทีม</h2>
+    <div class="two-col">
+      <div>
+        <p class="lead" style="margin-bottom: 2vh;">PR = ขอเอาโค้ดใน branch ของฉัน เข้า main ของทีม — มีคนรีวิวก่อน</p>
+        <ol class="steps">
+          <li>
+            <h3>Push branch ขึ้น GitHub</h3>
+            <p><code class="inline">git push -u origin feature/xxx</code></p>
+          </li>
+          <li>
+            <h3>เข้าหน้า repo บน GitHub</h3>
+            <p>มันจะขึ้นปุ่ม "Compare & pull request" สีเขียว</p>
+          </li>
+          <li>
+            <h3>เขียนคำอธิบาย</h3>
+            <p>ทำอะไร, ทำไม, ทดสอบยังไง, screenshot ถ้ามี</p>
+          </li>
+          <li>
+            <h3>Request review</h3>
+            <p>เลือก reviewer (พี่ในทีม) ทางขวา</p>
+          </li>
+          <li>
+            <h3>แก้ตาม comment</h3>
+            <p>commit + push ใหม่ → PR อัพเดทอัตโนมัติ</p>
+          </li>
+          <li>
+            <h3>Merge เมื่อได้ approve</h3>
+            <p>กดปุ่ม Merge → branch รวมเข้า main</p>
+          </li>
+        </ol>
+      </div>
+      <div class="col-stack">
+        <div class="card">
+          <span class="tag">PR Description Template</span>
+          <div class="code" data-label="GitHub · PR body" style="margin-top: 8px; font-size: 13px;">
+<span style="color:var(--accent)">## What</span>
+<span class="out">เพิ่ม login form หน้า /login</span>
+
+<span style="color:var(--accent)">## Why</span>
+<span class="out">User ขอให้แยกหน้า login
+ออกจากหน้าหลัก (Jira #123)</span>
+
+<span style="color:var(--accent)">## How to test</span>
+<span class="out">1. npm run dev
+2. เข้า /login
+3. ลองใส่ email ว่าง</span>
+
+<span style="color:var(--accent)">## Screenshot</span>
+<span class="out">[แนบรูป]</span>
+          </div>
+        </div>
+        <div class="callout">
+          <div class="label">มารยาทใน PR</div>
+          <p style="font-size: 14px;">PR ขนาดเล็ก รีวิวง่าย ผ่านเร็ว — แยกงานเป็นชิ้นเล็กๆ ดีกว่ารวมก้อนใหญ่</p>
+        </div>
+      </div>
+    </div>
+    <div class="footer">
+      <div>Code review workflow</div>
+      <div>12 / 14</div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 13: CHEATSHEET ============ -->
+  <section class="slide">
+    <div class="topbar">
+      <div class="left">Reference · Cheatsheet</div>
+      <div class="right">13 / 14</div>
+    </div>
+    <h2 class="section-title"><span class="num">/ reference</span>Cheatsheet — Print แปะข้างจอ</h2>
+    <div class="two-col">
+      <div>
+        <table class="cheat-table">
+          <thead>
+            <tr><th>Command</th><th>ทำอะไร</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>git init</td><td>เริ่ม repo ในโฟลเดอร์</td></tr>
+            <tr><td>git clone &lt;url&gt;</td><td>copy repo จาก GitHub</td></tr>
+            <tr><td>git status</td><td>ดูสถานะ (ใช้บ่อยสุด)</td></tr>
+            <tr><td>git add &lt;file&gt;</td><td>เอาไฟล์เข้า staging</td></tr>
+            <tr><td>git add .</td><td>เอาทุกไฟล์เข้า staging</td></tr>
+            <tr><td>git commit -m "msg"</td><td>บันทึก commit</td></tr>
+            <tr><td>git log --oneline</td><td>ดู history สั้นๆ</td></tr>
+            <tr><td>git diff</td><td>ดูว่าแก้อะไรไป</td></tr>
+            <tr><td>git restore &lt;file&gt;</td><td>ยกเลิกการแก้ไฟล์</td></tr>
+            <tr><td>git restore --staged</td><td>เอาออกจาก staging</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <table class="cheat-table">
+          <thead>
+            <tr><th>Command</th><th>ทำอะไร</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>git push</td><td>ส่งขึ้น GitHub</td></tr>
+            <tr><td>git pull</td><td>ดึงของล่าสุดลงมา</td></tr>
+            <tr><td>git fetch</td><td>ดูว่าใน remote มีอะไรใหม่</td></tr>
+            <tr><td>git branch</td><td>ดู branch ทั้งหมด</td></tr>
+            <tr><td>git switch -c &lt;name&gt;</td><td>สร้าง branch ใหม่</td></tr>
+            <tr><td>git switch &lt;name&gt;</td><td>สลับ branch</td></tr>
+            <tr><td>git merge &lt;name&gt;</td><td>รวม branch เข้ามา</td></tr>
+            <tr><td>git branch -d &lt;name&gt;</td><td>ลบ branch</td></tr>
+            <tr><td>git stash</td><td>เก็บงานชั่วคราว (ยังไม่ commit)</td></tr>
+            <tr><td>git stash pop</td><td>เอางานที่เก็บกลับมา</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="callout" style="margin-top: 3vh;">
+      <div class="label">VS Code Tip</div>
+      <p>ใช้ Source Control panel (Ctrl+Shift+G) — เห็น diff, stage, commit ได้แบบ GUI โดยไม่ต้องพิมพ์</p>
+    </div>
+    <div class="footer">
+      <div>Daily reference</div>
+      <div>13 / 14</div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 14: END ============ -->
+  <section class="slide" style="justify-content: center; align-items: center;">
+    <div class="topbar" style="position: absolute; top: 4vh; left: 6vw; right: 6vw;">
+      <div class="left">End</div>
+      <div class="right">14 / 14</div>
+    </div>
+    <div class="end-mark">/end.</div>
+    <h2 style="font-family: 'Fraunces', serif; font-weight: 300; font-size: 48px; margin-top: 3vh; letter-spacing: -0.02em;">ตอนนี้คุณ Git เป็นแล้ว</h2>
+    <p class="lead" style="margin-top: 2vh; text-align: center; max-width: 50ch;">ที่เหลือคือ <em>ทำซ้ำทุกวัน</em> — สัปดาห์เดียวจะคล่อง</p>
+
+    <div class="three-col" style="margin-top: 5vh; width: 80%; max-width: 900px;">
+      <div class="card" style="text-align: center;">
+        <span class="tag">Practice</span>
+        <h3>ฝึกกับ repo ส่วนตัว</h3>
+        <p style="margin-top: 8px; font-size: 14px;">สร้าง repo ของตัวเอง commit ทุกวัน 1 สัปดาห์</p>
+      </div>
+      <div class="card" style="text-align: center;">
+        <span class="tag">Read</span>
+        <h3>Pro Git book (ฟรี)</h3>
+        <p style="margin-top: 8px; font-size: 14px;">git-scm.com/book/en/v2 — อ่านเฉพาะที่ต้องใช้</p>
+      </div>
+      <div class="card" style="text-align: center;">
+        <span class="tag">Visual</span>
+        <h3>Learn Git Branching</h3>
+        <p style="margin-top: 8px; font-size: 14px;">learngitbranching.js.org — เกมฝึก branch</p>
+      </div>
+    </div>
+
+    <div style="margin-top: 5vh; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--ink-dimmer); letter-spacing: 0.2em; text-transform: uppercase;">
+      Questions? — ถามได้ทุกเรื่อง
+    </div>
+  </section>
+
+</div>
+
+<div class="counter"><span class="current">01</span> / 14</div>
+<div class="nav">
+  <button id="prev" title="Previous (←)">‹</button>
+  <button id="next" title="Next (→)">›</button>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const counter = document.querySelector('.counter .current');
+  let current = 0;
+
+  function show(i) {
+    if (i < 0 || i >= slides.length) return;
+    slides[current].classList.remove('active');
+    current = i;
+    slides[current].classList.add('active');
+    counter.textContent = String(current + 1).padStart(2, '0');
+  }
+
+  document.getElementById('next').onclick = () => show(current + 1);
+  document.getElementById('prev').onclick = () => show(current - 1);
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+      e.preventDefault();
+      show(current + 1);
+    } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+      e.preventDefault();
+      show(current - 1);
+    } else if (e.key === 'Home') {
+      show(0);
+    } else if (e.key === 'End') {
+      show(slides.length - 1);
+    }
+  });
+</script>
+
+</body>
+</html>
